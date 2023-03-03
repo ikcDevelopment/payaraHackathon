@@ -116,19 +116,143 @@ public class MedicalRecordService {
 
     public void deleteMedicalRecord(){}
 
-    public void updateLaboratoryAnalysis(){}
+    public void updateLaboratoryAnalysis(LaboratoryAnalysis lab){
+        this.message="Laboratory analysis successfully updated.";
+        MedicalRecord record = this.patientsRecordsTreeMap.get(lab.getPatientId());
+
+        if(Objects.nonNull(record)){
+            List<LaboratoryAnalysis> analysisDone = record.getAnalysisDone();
+            Optional<LaboratoryAnalysis> analysis = analysisDone.stream().filter(
+                    p->p.getLaboratoryKey().equals(lab.getLaboratoryKey())
+            ).findFirst();
+
+            if(analysis.isPresent()) {
+                LaboratoryAnalysis result = analysis.get();
+                int indice = analysisDone.indexOf(result);
+
+                if(indice>-1){
+                    // replace the new laboratory analysis
+                    // I replace result with lab and pursue the storage process
+                    analysisDone.set(indice, lab);
+                    record.setAnalysisDone(analysisDone);
+                    this.patientsRecordsTreeMap.replace(lab.getPatientId(), record);
+                    this.persister.store(this.patientsRecordsTreeMap);
+                }else{
+                    // there was an error
+                    this.message="There was an error recovering the analysis from database.";
+                }
+            }else{
+                this.message="The analysis doesn't exist in the database.";
+            }
+        }else{
+            this.message="The patient doesn't have a medical record.";
+        }
+    }
 
     public void deleteLaboratoryAnalysis(){}
 
-    public void updatePrescription(){}
+    public void updatePrescription(Prescription prescription){
+        this.message="Prescription successfully updated.";
+        MedicalRecord record = this.patientsRecordsTreeMap.get(prescription.getPatientId());
+
+        if(Objects.nonNull(record)){
+            List<Prescription> prescriptionsDone = record.getPrescriptions();
+            Optional<Prescription> prescriptionRecorded = prescriptionsDone.stream().filter(
+                    p->p.getPrescriptionKey().equals(prescription.getPrescriptionKey())
+            ).findFirst();
+
+            if(prescriptionRecorded.isPresent()) {
+                Prescription result = prescriptionRecorded.get();
+                int indice = prescriptionsDone.indexOf(result);
+
+                if(indice>-1){
+                    // replace the new laboratory analysis
+                    // I replace result with lab and pursue the storage process
+                    prescriptionsDone.set(indice, prescription);
+                    record.setPrescriptions(prescriptionsDone);
+                    this.patientsRecordsTreeMap.replace(prescription.getPatientId(), record);
+                    this.persister.store(this.patientsRecordsTreeMap);
+                }else{
+                    // there was an error
+                    this.message="There was an error recovering the Prescription from database.";
+                }
+            }else{
+                this.message="The Prescription doesn't exist in the database.";
+            }
+        }else{
+            this.message="The patient doesn't have a medical record.";
+        }
+    }
 
     public void deletePrescription(){}
 
-    public void updateMedicalProcedure(){}
+    public void updateMedicalProcedure(MedicalProcedure medicalProcedure){
+        this.message="Medical Procedure successfully updated.";
+        MedicalRecord record = this.patientsRecordsTreeMap.get(medicalProcedure.getPatientId());
+
+        if(Objects.nonNull(record)){
+            List<MedicalProcedure> proceduresDone = record.getProcedures();
+            Optional<MedicalProcedure> procedureRecorded = proceduresDone.stream().filter(
+                    p->p.getProcedureKey().equals(medicalProcedure.getProcedureKey())
+            ).findFirst();
+
+            if(procedureRecorded.isPresent()) {
+                MedicalProcedure result = procedureRecorded.get();
+                int indice = proceduresDone.indexOf(result);
+
+                if(indice>-1){
+                    // replace the new laboratory analysis
+                    // I replace result with lab and pursue the storage process
+                    proceduresDone.set(indice, medicalProcedure);
+                    record.setProcedures(proceduresDone);
+                    this.patientsRecordsTreeMap.replace(medicalProcedure.getPatientId(), record);
+                    this.persister.store(this.patientsRecordsTreeMap);
+                }else{
+                    // there was an error
+                    this.message="There was an error recovering the Medical Procedure from database.";
+                }
+            }else{
+                this.message="The Medical Procedure doesn't exist in the database.";
+            }
+        }else{
+            this.message="The patient doesn't have a medical record.";
+        }
+    }
 
     public void deleteMedicalProcedure(){}
 
-    public void updateHospitalization(){}
+    public void updateHospitalization(Hospitalization hospitalization){
+        this.message="Medical Procedure successfully updated.";
+        MedicalRecord record = this.patientsRecordsTreeMap.get(hospitalization.getPatientId());
+
+        if(Objects.nonNull(record)){
+            List<Hospitalization> hospitalizationsDone = record.getHospitalizations();
+            Optional<Hospitalization> procedureRecorded = hospitalizationsDone.stream().filter(
+                    p->p.getHospitalizationKey().equals(hospitalization.getHospitalizationKey())
+            ).findFirst();
+
+            if(procedureRecorded.isPresent()) {
+                Hospitalization result = procedureRecorded.get();
+                int indice = hospitalizationsDone.indexOf(result);
+
+                if(indice>-1){
+                    // replace the new laboratory analysis
+                    // I replace result with hospitalization and pursue the storage process
+                    hospitalizationsDone.set(indice, hospitalization);
+                    record.setHospitalizations(hospitalizationsDone);
+                    this.patientsRecordsTreeMap.replace(hospitalization.getPatientId(), record);
+                    this.persister.store(this.patientsRecordsTreeMap);
+                }else{
+                    // there was an error
+                    this.message="There was an error recovering the hospitalization from database.";
+                }
+            }else{
+                this.message="The hospitalization Procedure doesn't exist in the database.";
+            }
+        }else{
+            this.message="The patient doesn't have a medical record.";
+        }
+    }
 
     public void deleteHospitalization(){}
 
