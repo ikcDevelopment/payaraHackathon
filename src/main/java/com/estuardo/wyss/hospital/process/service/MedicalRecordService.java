@@ -23,6 +23,9 @@ import one.microstream.integrations.cdi.types.Storage;
 import one.microstream.persistence.types.Persister;
 
 import java.util.*;
+/**
+ * TODO refactor medical record, creating an object to store each visit to the hospital
+ */
 
 /**
  * @project payara.hackathon.jakartaEE10
@@ -112,9 +115,40 @@ public class MedicalRecordService {
         }
     }
 
-    public void updateMedicalRecord(){}
+    public void updateMedicalRecord(MedicalRecord medicalRecord){
+        this.message="Medical record successfully updated.";
+        MedicalRecord record = this.patientsRecordsTreeMap.get(medicalRecord.getPatientId());
 
-    public void deleteMedicalRecord(){}
+        if(Objects.nonNull(record)) {
+            record.setAdditionalComments(medicalRecord.getAdditionalComments());
+            record.setSymptoms(medicalRecord.getSymptoms());
+            record.setDoctorId(medicalRecord.getDoctorId());
+            record.setSymptomsStarted(medicalRecord.getSymptomsStarted());
+
+            this.patientsRecordsTreeMap.replace(medicalRecord.getPatientId(), record);
+            this.persister.store(this.patientsRecordsTreeMap);
+        }else{
+            this.message="The patient doesn't have a medical record.";
+        }
+    }
+
+    public void deleteMedicalRecord(String patientKey){
+        this.message="Medical record successfully updated.";
+        MedicalRecord record = this.patientsRecordsTreeMap.get(patientKey);
+
+        if(Objects.nonNull(record)) {
+            if(record.getAnalysisDone().size()>0 || record.getProcedures().size()>0
+                || record.getHospitalizations().size()>0 || record.getPrescriptions().size()>0
+            ){
+                this.message="It's not possible to delete the medical record you intend to, because it has valuable data on it. ";
+            }else{
+                this.patientsRecordsTreeMap.remove(patientKey);
+                this.persister.store(this.patientsRecordsTreeMap);
+            }
+        }else{
+            this.message="The patient doesn't have a medical record.";
+        }
+    }
 
     public void updateLaboratoryAnalysis(LaboratoryAnalysis lab){
         this.message="Laboratory analysis successfully updated.";
@@ -149,7 +183,38 @@ public class MedicalRecordService {
         }
     }
 
-    public void deleteLaboratoryAnalysis(){}
+    public void deleteLaboratoryAnalysis(String patientKey, String labKey){
+        this.message="Laboratory analysis successfully deleted.";
+        MedicalRecord record = this.patientsRecordsTreeMap.get(patientKey);
+
+        if(Objects.nonNull(record)){
+            List<LaboratoryAnalysis> labsDone = record.getAnalysisDone();
+            Optional<LaboratoryAnalysis>labsRecorded = labsDone.stream().filter(
+                    p->p.getLaboratoryKey().equals(labKey)
+            ).findFirst();
+
+            if(labsRecorded.isPresent()) {
+                LaboratoryAnalysis result = labsRecorded.get();
+                int indice = labsDone.indexOf(result);
+
+                if(indice>-1){
+                    // replace the new laboratory analysis
+                    // I replace result with hospitalization and pursue the storage process
+                    labsDone.remove(indice);
+                    record.setAnalysisDone(labsDone);
+                    this.patientsRecordsTreeMap.replace(patientKey, record);
+                    this.persister.store(this.patientsRecordsTreeMap);
+                }else{
+                    // there was an error
+                    this.message="There was an error recovering the Laboratory analysis from database.";
+                }
+            }else{
+                this.message="The Laboratory analysis doesn't exist in the database.";
+            }
+        }else{
+            this.message="The patient doesn't have a medical record.";
+        }
+    }
 
     public void updatePrescription(Prescription prescription){
         this.message="Prescription successfully updated.";
@@ -184,7 +249,38 @@ public class MedicalRecordService {
         }
     }
 
-    public void deletePrescription(){}
+    public void deletePrescription(String patientKey, String prescriptionKey){
+        this.message="Prescription successfully deleted.";
+        MedicalRecord record = this.patientsRecordsTreeMap.get(patientKey);
+
+        if(Objects.nonNull(record)){
+            List<Prescription> prescriptionsDone = record.getPrescriptions();
+            Optional<Prescription>prescriptionRecorded = prescriptionsDone.stream().filter(
+                    p->p.getPrescriptionKey().equals(prescriptionKey)
+            ).findFirst();
+
+            if(prescriptionRecorded.isPresent()) {
+                Prescription result = prescriptionRecorded.get();
+                int indice = prescriptionsDone.indexOf(result);
+
+                if(indice>-1){
+                    // replace the new laboratory analysis
+                    // I replace result with hospitalization and pursue the storage process
+                    prescriptionsDone.remove(indice);
+                    record.setPrescriptions(prescriptionsDone);
+                    this.patientsRecordsTreeMap.replace(patientKey, record);
+                    this.persister.store(this.patientsRecordsTreeMap);
+                }else{
+                    // there was an error
+                    this.message="There was an error recovering the prescription from database.";
+                }
+            }else{
+                this.message="The prescription doesn't exist in the database.";
+            }
+        }else{
+            this.message="The patient doesn't have a medical record.";
+        }
+    }
 
     public void updateMedicalProcedure(MedicalProcedure medicalProcedure){
         this.message="Medical Procedure successfully updated.";
@@ -219,10 +315,41 @@ public class MedicalRecordService {
         }
     }
 
-    public void deleteMedicalProcedure(){}
+    public void deleteMedicalProcedure(String patientKey, String medicalProcedureKey){
+        this.message="Medical procedure successfully deleted.";
+        MedicalRecord record = this.patientsRecordsTreeMap.get(patientKey);
+
+        if(Objects.nonNull(record)){
+            List<MedicalProcedure> medicalProceduresDone = record.getProcedures();
+            Optional<MedicalProcedure>medicalProcedureRecorded = medicalProceduresDone.stream().filter(
+                    p->p.getProcedureKey().equals(medicalProcedureKey)
+            ).findFirst();
+
+            if(medicalProcedureRecorded.isPresent()) {
+                MedicalProcedure result = medicalProcedureRecorded.get();
+                int indice = medicalProceduresDone.indexOf(result);
+
+                if(indice>-1){
+                    // replace the new laboratory analysis
+                    // I replace result with hospitalization and pursue the storage process
+                    medicalProceduresDone.remove(indice);
+                    record.setProcedures(medicalProceduresDone);
+                    this.patientsRecordsTreeMap.replace(patientKey, record);
+                    this.persister.store(this.patientsRecordsTreeMap);
+                }else{
+                    // there was an error
+                    this.message="There was an error recovering the hospitalization from database.";
+                }
+            }else{
+                this.message="The hospitalization Procedure doesn't exist in the database.";
+            }
+        }else{
+            this.message="The patient doesn't have a medical record.";
+        }
+    }
 
     public void updateHospitalization(Hospitalization hospitalization){
-        this.message="Medical Procedure successfully updated.";
+        this.message="Hospitalization successfully updated.";
         MedicalRecord record = this.patientsRecordsTreeMap.get(hospitalization.getPatientId());
 
         if(Objects.nonNull(record)){
@@ -254,7 +381,38 @@ public class MedicalRecordService {
         }
     }
 
-    public void deleteHospitalization(){}
+    public void deleteHospitalization(String patientKey, String hospitalizationKey){
+        this.message="Hospitalization successfully deleted.";
+        MedicalRecord record = this.patientsRecordsTreeMap.get(patientKey);
+
+        if(Objects.nonNull(record)){
+            List<Hospitalization> hospitalizationsDone = record.getHospitalizations();
+            Optional<Hospitalization> hospitalizationRecorded = hospitalizationsDone.stream().filter(
+                    p->p.getHospitalizationKey().equals(hospitalizationKey)
+            ).findFirst();
+
+            if(hospitalizationRecorded.isPresent()) {
+                Hospitalization result = hospitalizationRecorded.get();
+                int indice = hospitalizationsDone.indexOf(result);
+
+                if(indice>-1){
+                    // replace the new laboratory analysis
+                    // I replace result with hospitalization and pursue the storage process
+                    hospitalizationsDone.remove(indice);
+                    record.setHospitalizations(hospitalizationsDone);
+                    this.patientsRecordsTreeMap.replace(patientKey, record);
+                    this.persister.store(this.patientsRecordsTreeMap);
+                }else{
+                    // there was an error
+                    this.message="There was an error recovering the hospitalization from database.";
+                }
+            }else{
+                this.message="The hospitalization Procedure doesn't exist in the database.";
+            }
+        }else{
+            this.message="The patient doesn't have a medical record.";
+        }
+    }
 
     @Override
     public boolean equals(final Object o){

@@ -15,6 +15,7 @@ package com.estuardo.wyss.hospital.process.service;
 
 import com.estuardo.wyss.hospital.patient.entities.Patient;
 import jakarta.inject.Inject;
+import lombok.Getter;
 import one.microstream.integrations.cdi.types.Storage;
 import one.microstream.persistence.types.Persister;
 
@@ -33,6 +34,7 @@ public class PatientService {
 
     private final TreeMap<String, Patient> patientsTreeMap = new TreeMap<>();
 
+    @Getter
     private String message="";
 
     public boolean addPatient(Patient patient){

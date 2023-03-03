@@ -17,7 +17,7 @@ package com.estuardo.wyss.hospital;
 import jakarta.ws.rs.ApplicationPath;
 import jakarta.ws.rs.core.Application;
 
-@ApplicationPath("/hospital")
+@ApplicationPath("/wyss-hospital")
 public class ApplicationConfig extends Application {
 
 }
