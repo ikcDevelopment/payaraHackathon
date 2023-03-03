@@ -15,6 +15,7 @@ package com.estuardo.wyss.hospital.process.service;
 
 import com.estuardo.wyss.hospital.hr.personnel.entities.Personnel;
 import jakarta.inject.Inject;
+import lombok.Getter;
 import one.microstream.integrations.cdi.types.Storage;
 import one.microstream.persistence.types.Persister;
 
@@ -33,6 +34,7 @@ public class PersonnelService {
 
     private final TreeMap<String, Personnel> personnelTreeMap = new TreeMap<>();
 
+    @Getter
     private String message="";
 
     public boolean addEmployee(Personnel employee){
