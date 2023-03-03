@@ -14,11 +14,10 @@
  ********************************************************************************/
 package com.estuardo.wyss.hospital;
 
-import io.micronaut.runtime.Micronaut;
+import jakarta.ws.rs.ApplicationPath;
+import jakarta.ws.rs.core.Application;
 
-public class ApplicationConfig  {
-    public static void main(String[] args)
-    {
-        Micronaut.run(ApplicationConfig.class, args);
-    }
+@ApplicationPath("/hospital")
+public class ApplicationConfig extends Application {
+
 }
