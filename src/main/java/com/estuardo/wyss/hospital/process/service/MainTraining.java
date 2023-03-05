@@ -49,6 +49,7 @@ public class MainTraining {
         analysisDone.removeIf(p->p.getLaboratoryKey().equals("dkjfj"));
 
         int indice = analysisDone.indexOf(a5);
+
         System.out.println(indice);
     }
 }

@@ -1,7 +1,11 @@
 package com.estuardo.wyss.hospital.controller;
 
 
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 
 /**
  * @project payara.hackathon.jakartaEE10
@@ -9,5 +13,13 @@ import jakarta.ws.rs.Path;
  * @date 03/02/2023
  */
 @Path("/analysis")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
 public class AnalysisController {
+    @GET
+    @Path("/ping")
+    public String hello() {
+        return "Your are getting into wyss-hospital-personnel Cloud Applications World!";
+    }
+
 }

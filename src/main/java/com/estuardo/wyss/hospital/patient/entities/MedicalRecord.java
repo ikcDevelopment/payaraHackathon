@@ -13,6 +13,7 @@ limitations under the License.*/
 
 package com.estuardo.wyss.hospital.patient.entities;
 
+import com.estuardo.wyss.hospital.treatment.Appointment;
 import com.estuardo.wyss.hospital.treatment.Hospitalization;
 import com.estuardo.wyss.hospital.treatment.MedicalProcedure;
 import com.estuardo.wyss.hospital.treatment.Prescription;
@@ -34,11 +35,6 @@ public class MedicalRecord {
     private String recordKey;
     private String patientId;
     private String doctorId;
-    private String symptoms;
-    private Date symptomsStarted;
-    private List<LaboratoryAnalysis> analysisDone=new ArrayList<>();
-    private List<Prescription> prescriptions=new ArrayList<>();
-    private List<MedicalProcedure> procedures=new ArrayList<>();
-    private List<Hospitalization> hospitalizations=new ArrayList<>();
+    private List<Appointment> appointments;
     private String additionalComments;
 }

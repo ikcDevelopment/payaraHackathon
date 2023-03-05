@@ -15,10 +15,12 @@ package com.estuardo.wyss.hospital.process.service;
 
 import com.estuardo.wyss.hospital.patient.entities.LaboratoryAnalysis;
 import com.estuardo.wyss.hospital.patient.entities.MedicalRecord;
+import com.estuardo.wyss.hospital.treatment.Appointment;
 import com.estuardo.wyss.hospital.treatment.Hospitalization;
 import com.estuardo.wyss.hospital.treatment.MedicalProcedure;
 import com.estuardo.wyss.hospital.treatment.Prescription;
 import jakarta.inject.Inject;
+import lombok.Getter;
 import one.microstream.integrations.cdi.types.Storage;
 import one.microstream.persistence.types.Persister;
 
@@ -39,7 +41,7 @@ public class MedicalRecordService {
     private transient Persister persister;
 
     private final TreeMap<String, MedicalRecord> patientsRecordsTreeMap = new TreeMap<>();
-
+    @Getter
     private String message="";
 
     /**
@@ -59,358 +61,534 @@ public class MedicalRecordService {
         }
     }
 
-    public boolean addLaboratoryAnalysis(String patientId, LaboratoryAnalysis lab){
+    public boolean addAppointment(Appointment appointment){
+        this.message="Medical record for the Patient successfully added.";
+        if(this.patientsRecordsTreeMap.containsKey(appointment.getPatientId())){
+            MedicalRecord record = this.patientsRecordsTreeMap.get(appointment.getPatientId());
+
+            if(Objects.nonNull(record)){
+                Optional<Appointment> appointmentE = record .getAppointments().stream()
+                        .filter(r -> r.getAppointmentKey().equals(appointment.getAppointmentKey())).findFirst();
+
+                if(appointmentE.isEmpty()){
+                    record.getAppointments().add(appointment);
+                    this.patientsRecordsTreeMap.put(record.getPatientId(), record);
+                    this.persister.store(this.patientsRecordsTreeMap);
+                    return true;
+                }else{
+                    this.message="The appointment already exists in database.";
+                    return false;
+                }
+
+            }else{
+                // there is no record
+                this.message="Patient doesn't have a medical.";
+                return false;
+            }
+
+        }else{
+            this.message="Patient already has a medical record in database.";
+            return false;
+        }
+    }
+
+    public boolean addLaboratoryAnalysis(String patientId, String appointmentKey, LaboratoryAnalysis lab){
         this.message="Laboratory analysis successfully added.";
         MedicalRecord record = this.patientsRecordsTreeMap.get(patientId);
 
         if(Objects.nonNull(record)){
-            record.getAnalysisDone().add(lab);
-            this.persister.store(this.patientsRecordsTreeMap);
-            return true;
+            Optional<Appointment> appointmentE = record .getAppointments().stream()
+                    .filter(r -> r.getAppointmentKey().equals(appointmentKey)).findFirst();
+
+            if(appointmentE.isPresent()) {
+                Appointment appointmentRecovered = appointmentE.get();
+                int appointmentIndex = record.getAppointments().indexOf(appointmentRecovered);
+                // add appointment
+                appointmentRecovered.getAnalysisDone().add(lab);
+                // update appointments in record
+                record.getAppointments().set(appointmentIndex, appointmentRecovered);
+                // update treeMap with record
+                this.patientsRecordsTreeMap.replace(patientId, record);
+                // update store
+                this.persister.store(this.patientsRecordsTreeMap);
+                return true;
+            }else{
+                this.message="Appointment doesn't exist.";
+                return false;
+            }
         }else{
-            this.message="A problem was found while adding the laboratory analysis.";
+            this.message="Patient doesn't have a medical.";
             return false;
         }
     }
 
-    public boolean addPrescription(String patientId, Prescription medicine){
+    public boolean addPrescription(String patientId, String appointmentKey, Prescription medicine){
         this.message="Prescription successfully added.";
         MedicalRecord record = this.patientsRecordsTreeMap.get(patientId);
 
         if(Objects.nonNull(record)){
-            record.getPrescriptions().add(medicine);
-            this.persister.store(this.patientsRecordsTreeMap);
-            return true;
+            Optional<Appointment> appointmentE = record.getAppointments().stream()
+                    .filter(r -> r.getAppointmentKey().equals(appointmentKey)).findFirst();
+
+            if(appointmentE.isPresent()) {
+                Appointment appointmentRecovered = appointmentE.get();
+                int appointmentIndex = record.getAppointments().indexOf(appointmentRecovered);
+                // add medicine (prescription)
+                appointmentRecovered.getPrescriptions().add(medicine);
+                // update appointments in record
+                record.getAppointments().set(appointmentIndex, appointmentRecovered);
+                // update treeMap with record
+                this.patientsRecordsTreeMap.replace(patientId, record);
+                // update store
+                this.persister.store(this.patientsRecordsTreeMap);
+                return true;
+            }else{
+                this.message="Appointment doesn't exist.";
+                return false;
+            }
+
         }else{
-            this.message="A problem was found while adding the prescription.";
+            this.message="Patient doesn't have a medical.";
             return false;
         }
     }
 
-    public boolean addMedicalProcedure(String patientId, MedicalProcedure procedure){
+    public boolean addMedicalProcedure(String patientId, String appointmentKey, MedicalProcedure procedure){
         this.message="Medical procedure successfully added.";
         MedicalRecord record = this.patientsRecordsTreeMap.get(patientId);
 
         if(Objects.nonNull(record)){
-            record.getProcedures().add(procedure);
-            this.persister.store(this.patientsRecordsTreeMap);
-            return true;
+            Optional<Appointment> appointmentE = record.getAppointments().stream()
+                    .filter(r -> r.getAppointmentKey().equals(appointmentKey)).findFirst();
+
+            if(appointmentE.isPresent()) {
+                Appointment appointmentRecovered = appointmentE.get();
+                int appointmentIndex = record.getAppointments().indexOf(appointmentRecovered);
+                // add procedure to the appointment
+                appointmentRecovered.getProcedures().add(procedure);
+                // update appointments in record
+                record.getAppointments().set(appointmentIndex, appointmentRecovered);
+                // update treeMap with record
+                this.patientsRecordsTreeMap.replace(patientId, record);
+                // update store
+                this.persister.store(this.patientsRecordsTreeMap);
+                return true;
+            }else{
+                this.message="Appointment doesn't exist.";
+                return false;
+            }
         }else{
-            this.message="A problem was found while adding the medical procedure.";
+            this.message="Patient doesn't have a medical.";
             return false;
         }
     }
 
-    public boolean addHospitalization(String patientId, Hospitalization hospitalization){
+    public boolean addHospitalization(String patientId, String appointmentKey, Hospitalization hospitalization){
         this.message="Hospitalization successfully added.";
         MedicalRecord record = this.patientsRecordsTreeMap.get(patientId);
 
         if(Objects.nonNull(record)){
-            record.getHospitalizations().add(hospitalization);
-            this.persister.store(this.patientsRecordsTreeMap);
-            return true;
+            Optional<Appointment> appointmentE = record.getAppointments().stream()
+                    .filter(r -> r.getAppointmentKey().equals(appointmentKey)).findFirst();
+
+            if(appointmentE.isPresent()) {
+                Appointment appointmentRecovered = appointmentE.get();
+                int appointmentIndex = record.getAppointments().indexOf(appointmentRecovered);
+                // add hospitalization to the appointment
+                appointmentRecovered.getHospitalizations().add(hospitalization);
+                // update appointments in record
+                record.getAppointments().set(appointmentIndex, appointmentRecovered);
+                // update treeMap with record
+                this.patientsRecordsTreeMap.replace(patientId, record);
+                // update store
+                this.persister.store(this.patientsRecordsTreeMap);
+                return true;
+            }else{
+                this.message="Appointment doesn't exist.";
+                return false;
+            }
         }else{
-            this.message="A problem was found while adding the hospitalization.";
+            this.message="Patient doesn't have a medical.";
             return false;
         }
     }
 
-    public void updateMedicalRecord(MedicalRecord medicalRecord){
+    public boolean updateMedicalRecord(MedicalRecord medicalRecord){
         this.message="Medical record successfully updated.";
         MedicalRecord record = this.patientsRecordsTreeMap.get(medicalRecord.getPatientId());
 
         if(Objects.nonNull(record)) {
             record.setAdditionalComments(medicalRecord.getAdditionalComments());
-            record.setSymptoms(medicalRecord.getSymptoms());
             record.setDoctorId(medicalRecord.getDoctorId());
-            record.setSymptomsStarted(medicalRecord.getSymptomsStarted());
 
             this.patientsRecordsTreeMap.replace(medicalRecord.getPatientId(), record);
             this.persister.store(this.patientsRecordsTreeMap);
+            return true;
         }else{
             this.message="The patient doesn't have a medical record.";
+            return false;
         }
     }
 
-    public void deleteMedicalRecord(String patientKey){
+    public boolean deleteMedicalRecord(String patientKey){
         this.message="Medical record successfully updated.";
         MedicalRecord record = this.patientsRecordsTreeMap.get(patientKey);
 
         if(Objects.nonNull(record)) {
-            if(record.getAnalysisDone().size()>0 || record.getProcedures().size()>0
-                || record.getHospitalizations().size()>0 || record.getPrescriptions().size()>0
-            ){
+            if(record.getAppointments().size()>0){
                 this.message="It's not possible to delete the medical record you intend to, because it has valuable data on it. ";
+                return false;
             }else{
                 this.patientsRecordsTreeMap.remove(patientKey);
                 this.persister.store(this.patientsRecordsTreeMap);
+                return true;
             }
         }else{
             this.message="The patient doesn't have a medical record.";
+            return false;
         }
     }
 
-    public void updateLaboratoryAnalysis(LaboratoryAnalysis lab){
+    public boolean updateLaboratoryAnalysis(String appointmentKey, LaboratoryAnalysis lab){
         this.message="Laboratory analysis successfully updated.";
         MedicalRecord record = this.patientsRecordsTreeMap.get(lab.getPatientId());
 
         if(Objects.nonNull(record)){
-            List<LaboratoryAnalysis> analysisDone = record.getAnalysisDone();
-            Optional<LaboratoryAnalysis> analysis = analysisDone.stream().filter(
-                    p->p.getLaboratoryKey().equals(lab.getLaboratoryKey())
-            ).findFirst();
+            Optional<Appointment> appointmentE = record.getAppointments().stream()
+                    .filter(r -> r.getAppointmentKey().equals(appointmentKey)).findFirst();
 
-            if(analysis.isPresent()) {
-                LaboratoryAnalysis result = analysis.get();
-                int indice = analysisDone.indexOf(result);
+            if(appointmentE.isPresent()) {
+                Appointment appointmentRecovered = appointmentE.get();
+                int appointmentIndex = record.getAppointments().indexOf(appointmentRecovered);
 
-                if(indice>-1){
-                    // replace the new laboratory analysis
-                    // I replace result with lab and pursue the storage process
-                    analysisDone.set(indice, lab);
-                    record.setAnalysisDone(analysisDone);
+                List<LaboratoryAnalysis> analysisDone = appointmentRecovered.getAnalysisDone();
+
+                Optional<LaboratoryAnalysis> analysisE = analysisDone.stream()
+                        .filter(a -> a.getLaboratoryKey().equals(lab.getLaboratoryKey())).findFirst();
+
+                if(analysisE.isPresent()){
+                    LaboratoryAnalysis laboratoryAnalysisRecovered = analysisE.get();
+                    int laboratoryAnalysisIndex = appointmentRecovered.getAnalysisDone().indexOf(laboratoryAnalysisRecovered);
+                    // replace element
+                    appointmentRecovered.getAnalysisDone().set(laboratoryAnalysisIndex, lab);
+                    // update appointments in record
+                    record.getAppointments().set(appointmentIndex, appointmentRecovered);
+                    // update treeMap with record
                     this.patientsRecordsTreeMap.replace(lab.getPatientId(), record);
+                    // update store
                     this.persister.store(this.patientsRecordsTreeMap);
+                    return true;
                 }else{
-                    // there was an error
-                    this.message="There was an error recovering the analysis from database.";
+                    this.message="Laboratory analysis doesn't exist.";
+                    return false;
                 }
             }else{
-                this.message="The analysis doesn't exist in the database.";
+                this.message="Appointment doesn't exist.";
+                return false;
             }
         }else{
             this.message="The patient doesn't have a medical record.";
+            return false;
         }
     }
 
-    public void deleteLaboratoryAnalysis(String patientKey, String labKey){
+    public boolean deleteLaboratoryAnalysis(String patientKey, String appointmentKey, String labKey){
         this.message="Laboratory analysis successfully deleted.";
         MedicalRecord record = this.patientsRecordsTreeMap.get(patientKey);
 
         if(Objects.nonNull(record)){
-            List<LaboratoryAnalysis> labsDone = record.getAnalysisDone();
-            Optional<LaboratoryAnalysis>labsRecorded = labsDone.stream().filter(
-                    p->p.getLaboratoryKey().equals(labKey)
-            ).findFirst();
+            Optional<Appointment> appointmentE = record.getAppointments().stream()
+                    .filter(r -> r.getAppointmentKey().equals(appointmentKey)).findFirst();
 
-            if(labsRecorded.isPresent()) {
-                LaboratoryAnalysis result = labsRecorded.get();
-                int indice = labsDone.indexOf(result);
+            if(appointmentE.isPresent()) {
+                Appointment appointmentRecovered = appointmentE.get();
+                int appointmentIndex = record.getAppointments().indexOf(appointmentRecovered);
 
-                if(indice>-1){
-                    // replace the new laboratory analysis
-                    // I replace result with hospitalization and pursue the storage process
-                    labsDone.remove(indice);
-                    record.setAnalysisDone(labsDone);
+                List<LaboratoryAnalysis> analysisDone = appointmentRecovered.getAnalysisDone();
+
+                Optional<LaboratoryAnalysis> analysisE = analysisDone.stream()
+                        .filter(a -> a.getLaboratoryKey().equals(labKey)).findFirst();
+
+                if(analysisE.isPresent()){
+                    LaboratoryAnalysis laboratoryAnalysisRecovered = analysisE.get();
+                    int laboratoryAnalysisIndex = appointmentRecovered.getAnalysisDone().indexOf(laboratoryAnalysisRecovered);
+                    // replace element
+                    appointmentRecovered.getAnalysisDone().remove(laboratoryAnalysisRecovered);
+                    // update appointments in record
+                    record.getAppointments().set(appointmentIndex, appointmentRecovered);
+                    // update treeMap with record
                     this.patientsRecordsTreeMap.replace(patientKey, record);
+                    // update store
                     this.persister.store(this.patientsRecordsTreeMap);
+                    return true;
                 }else{
-                    // there was an error
-                    this.message="There was an error recovering the Laboratory analysis from database.";
+                    this.message="Laboratory analysis doesn't exist.";
+                    return false;
                 }
             }else{
-                this.message="The Laboratory analysis doesn't exist in the database.";
+                this.message="Appointment doesn't exist.";
+                return false;
             }
         }else{
             this.message="The patient doesn't have a medical record.";
+            return false;
         }
     }
 
-    public void updatePrescription(Prescription prescription){
+    public boolean updatePrescription(String appointmentKey, Prescription prescription){
         this.message="Prescription successfully updated.";
         MedicalRecord record = this.patientsRecordsTreeMap.get(prescription.getPatientId());
 
         if(Objects.nonNull(record)){
-            List<Prescription> prescriptionsDone = record.getPrescriptions();
-            Optional<Prescription> prescriptionRecorded = prescriptionsDone.stream().filter(
-                    p->p.getPrescriptionKey().equals(prescription.getPrescriptionKey())
-            ).findFirst();
+            Optional<Appointment> appointmentE = record.getAppointments().stream()
+                    .filter(r -> r.getAppointmentKey().equals(appointmentKey)).findFirst();
 
-            if(prescriptionRecorded.isPresent()) {
-                Prescription result = prescriptionRecorded.get();
-                int indice = prescriptionsDone.indexOf(result);
+            if(appointmentE.isPresent()) {
+                Appointment appointmentRecovered = appointmentE.get();
+                int appointmentIndex = record.getAppointments().indexOf(appointmentRecovered);
 
-                if(indice>-1){
-                    // replace the new laboratory analysis
-                    // I replace result with lab and pursue the storage process
-                    prescriptionsDone.set(indice, prescription);
-                    record.setPrescriptions(prescriptionsDone);
+                List<Prescription> prescriptionDone = appointmentRecovered.getPrescriptions();
+
+                Optional<Prescription> prescriptionE = prescriptionDone.stream()
+                        .filter(p -> p.getPrescriptionKey().equals(prescription.getPrescriptionKey())).findFirst();
+
+                if(prescriptionE.isPresent()){
+                    Prescription prescriptionRecovered = prescriptionE.get();
+                    int prescriptionIndex = appointmentRecovered.getPrescriptions().indexOf(prescriptionRecovered);
+                    // replace element
+                    appointmentRecovered.getPrescriptions().set(prescriptionIndex, prescription);
+                    // update appointments in record
+                    record.getAppointments().set(appointmentIndex, appointmentRecovered);
+                    // update treeMap with record
                     this.patientsRecordsTreeMap.replace(prescription.getPatientId(), record);
+                    // update store
                     this.persister.store(this.patientsRecordsTreeMap);
+                    return true;
                 }else{
-                    // there was an error
-                    this.message="There was an error recovering the Prescription from database.";
+                    this.message="Laboratory analysis doesn't exist.";
+                    return false;
                 }
             }else{
-                this.message="The Prescription doesn't exist in the database.";
+                this.message="Appointment doesn't exist.";
+                return false;
             }
         }else{
             this.message="The patient doesn't have a medical record.";
+            return false;
         }
     }
 
-    public void deletePrescription(String patientKey, String prescriptionKey){
+    public boolean deletePrescription(String patientKey, String appointmentKey, String prescriptionKey){
         this.message="Prescription successfully deleted.";
         MedicalRecord record = this.patientsRecordsTreeMap.get(patientKey);
 
         if(Objects.nonNull(record)){
-            List<Prescription> prescriptionsDone = record.getPrescriptions();
-            Optional<Prescription>prescriptionRecorded = prescriptionsDone.stream().filter(
-                    p->p.getPrescriptionKey().equals(prescriptionKey)
-            ).findFirst();
+            Optional<Appointment> appointmentE = record.getAppointments().stream()
+                    .filter(r -> r.getAppointmentKey().equals(appointmentKey)).findFirst();
 
-            if(prescriptionRecorded.isPresent()) {
-                Prescription result = prescriptionRecorded.get();
-                int indice = prescriptionsDone.indexOf(result);
+            if(appointmentE.isPresent()) {
+                Appointment appointmentRecovered = appointmentE.get();
+                int appointmentIndex = record.getAppointments().indexOf(appointmentRecovered);
 
-                if(indice>-1){
-                    // replace the new laboratory analysis
-                    // I replace result with hospitalization and pursue the storage process
-                    prescriptionsDone.remove(indice);
-                    record.setPrescriptions(prescriptionsDone);
+                List<Prescription> prescriptionsDone = appointmentRecovered.getPrescriptions();
+
+                Optional<Prescription> prescriptionE = prescriptionsDone.stream()
+                        .filter(p -> p.getPrescriptionKey().equals(prescriptionKey)).findFirst();
+
+                if(prescriptionE.isPresent()){
+                    Prescription prescriptionRecovered = prescriptionE.get();
+                    int prescriptionIndex = appointmentRecovered.getPrescriptions().indexOf(prescriptionRecovered);
+                    // replace element
+                    appointmentRecovered.getPrescriptions().remove(prescriptionRecovered);
+                    // update appointments in record
+                    record.getAppointments().set(appointmentIndex, appointmentRecovered);
+                    // update treeMap with record
                     this.patientsRecordsTreeMap.replace(patientKey, record);
+                    // update store
                     this.persister.store(this.patientsRecordsTreeMap);
+                    return true;
                 }else{
-                    // there was an error
-                    this.message="There was an error recovering the prescription from database.";
+                    this.message="Prescription doesn't exist.";
+                    return false;
                 }
             }else{
-                this.message="The prescription doesn't exist in the database.";
+                this.message="Appointment doesn't exist.";
+                return false;
             }
         }else{
             this.message="The patient doesn't have a medical record.";
+            return false;
         }
+
     }
 
-    public void updateMedicalProcedure(MedicalProcedure medicalProcedure){
+    public boolean updateMedicalProcedure(String appointmentKey, MedicalProcedure medicalProcedure){
         this.message="Medical Procedure successfully updated.";
         MedicalRecord record = this.patientsRecordsTreeMap.get(medicalProcedure.getPatientId());
 
         if(Objects.nonNull(record)){
-            List<MedicalProcedure> proceduresDone = record.getProcedures();
-            Optional<MedicalProcedure> procedureRecorded = proceduresDone.stream().filter(
-                    p->p.getProcedureKey().equals(medicalProcedure.getProcedureKey())
-            ).findFirst();
+            Optional<Appointment> appointmentE = record.getAppointments().stream()
+                    .filter(r -> r.getAppointmentKey().equals(appointmentKey)).findFirst();
 
-            if(procedureRecorded.isPresent()) {
-                MedicalProcedure result = procedureRecorded.get();
-                int indice = proceduresDone.indexOf(result);
+            if(appointmentE.isPresent()) {
+                Appointment appointmentRecovered = appointmentE.get();
+                int appointmentIndex = record.getAppointments().indexOf(appointmentRecovered);
 
-                if(indice>-1){
-                    // replace the new laboratory analysis
-                    // I replace result with lab and pursue the storage process
-                    proceduresDone.set(indice, medicalProcedure);
-                    record.setProcedures(proceduresDone);
+                List<MedicalProcedure> proceduresDone = appointmentRecovered.getProcedures();
+
+                Optional<MedicalProcedure> procedureE = proceduresDone.stream()
+                        .filter(p -> p.getProcedureKey().equals(medicalProcedure.getProcedureKey())).findFirst();
+
+                if(procedureE.isPresent()){
+                    MedicalProcedure procedureRecovered = procedureE.get();
+                    int procedureIndex = appointmentRecovered.getProcedures().indexOf(procedureRecovered);
+                    // replace element
+                    appointmentRecovered.getProcedures().set(procedureIndex, medicalProcedure);
+                    // update appointments in record
+                    record.getAppointments().set(appointmentIndex, appointmentRecovered);
+                    // update treeMap with record
                     this.patientsRecordsTreeMap.replace(medicalProcedure.getPatientId(), record);
+                    // update store
                     this.persister.store(this.patientsRecordsTreeMap);
+                    return true;
                 }else{
-                    // there was an error
-                    this.message="There was an error recovering the Medical Procedure from database.";
+                    this.message="Medical procedure doesn't exist.";
+                    return false;
                 }
             }else{
-                this.message="The Medical Procedure doesn't exist in the database.";
+                this.message="Appointment doesn't exist.";
+                return false;
             }
         }else{
             this.message="The patient doesn't have a medical record.";
+            return true;
         }
     }
 
-    public void deleteMedicalProcedure(String patientKey, String medicalProcedureKey){
+    public boolean deleteMedicalProcedure(String patientKey, String appointmentKey, String medicalProcedureKey){
         this.message="Medical procedure successfully deleted.";
         MedicalRecord record = this.patientsRecordsTreeMap.get(patientKey);
 
         if(Objects.nonNull(record)){
-            List<MedicalProcedure> medicalProceduresDone = record.getProcedures();
-            Optional<MedicalProcedure>medicalProcedureRecorded = medicalProceduresDone.stream().filter(
-                    p->p.getProcedureKey().equals(medicalProcedureKey)
-            ).findFirst();
+            Optional<Appointment> appointmentE = record.getAppointments().stream()
+                    .filter(r -> r.getAppointmentKey().equals(appointmentKey)).findFirst();
 
-            if(medicalProcedureRecorded.isPresent()) {
-                MedicalProcedure result = medicalProcedureRecorded.get();
-                int indice = medicalProceduresDone.indexOf(result);
+            if(appointmentE.isPresent()) {
+                Appointment appointmentRecovered = appointmentE.get();
+                int appointmentIndex = record.getAppointments().indexOf(appointmentRecovered);
 
-                if(indice>-1){
-                    // replace the new laboratory analysis
-                    // I replace result with hospitalization and pursue the storage process
-                    medicalProceduresDone.remove(indice);
-                    record.setProcedures(medicalProceduresDone);
+                List<MedicalProcedure> proceduresDone = appointmentRecovered.getProcedures();
+
+                Optional<MedicalProcedure> procedureE = proceduresDone.stream()
+                        .filter(p -> p.getProcedureKey().equals(medicalProcedureKey)).findFirst();
+
+                if(procedureE.isPresent()){
+                    MedicalProcedure procedureRecovered = procedureE.get();
+                    // replace element
+                    appointmentRecovered.getProcedures().remove(procedureRecovered);
+                    // update appointments in record
+                    record.getAppointments().set(appointmentIndex, appointmentRecovered);
+                    // update treeMap with record
                     this.patientsRecordsTreeMap.replace(patientKey, record);
+                    // update store
                     this.persister.store(this.patientsRecordsTreeMap);
+                    return true;
                 }else{
-                    // there was an error
-                    this.message="There was an error recovering the hospitalization from database.";
+                    this.message="Medical procedure doesn't exist.";
+                    return false;
                 }
             }else{
-                this.message="The hospitalization Procedure doesn't exist in the database.";
+                this.message="Appointment doesn't exist.";
+                return false;
             }
         }else{
             this.message="The patient doesn't have a medical record.";
+            return false;
         }
     }
 
-    public void updateHospitalization(Hospitalization hospitalization){
+    public boolean updateHospitalization(String appointmentKey, Hospitalization hospitalization){
         this.message="Hospitalization successfully updated.";
         MedicalRecord record = this.patientsRecordsTreeMap.get(hospitalization.getPatientId());
 
         if(Objects.nonNull(record)){
-            List<Hospitalization> hospitalizationsDone = record.getHospitalizations();
-            Optional<Hospitalization> procedureRecorded = hospitalizationsDone.stream().filter(
-                    p->p.getHospitalizationKey().equals(hospitalization.getHospitalizationKey())
-            ).findFirst();
+            Optional<Appointment> appointmentE = record.getAppointments().stream()
+                    .filter(r -> r.getAppointmentKey().equals(appointmentKey)).findFirst();
 
-            if(procedureRecorded.isPresent()) {
-                Hospitalization result = procedureRecorded.get();
-                int indice = hospitalizationsDone.indexOf(result);
+            if(appointmentE.isPresent()) {
+                Appointment appointmentRecovered = appointmentE.get();
+                int appointmentIndex = record.getAppointments().indexOf(appointmentRecovered);
 
-                if(indice>-1){
-                    // replace the new laboratory analysis
-                    // I replace result with hospitalization and pursue the storage process
-                    hospitalizationsDone.set(indice, hospitalization);
-                    record.setHospitalizations(hospitalizationsDone);
+                List<Hospitalization> hospitalizationsDone = appointmentRecovered.getHospitalizations();
+
+                Optional<Hospitalization> hospitalizationE = hospitalizationsDone.stream()
+                        .filter(h -> h.getHospitalizationKey().equals(hospitalization.getHospitalizationKey())).findFirst();
+
+                if(hospitalizationE.isPresent()){
+                    Hospitalization hospitalizationRecovered = hospitalizationE.get();
+                    int hospitalizationIndex = appointmentRecovered.getHospitalizations().indexOf(hospitalizationRecovered);
+                    // replace element
+                    appointmentRecovered.getHospitalizations().set(hospitalizationIndex, hospitalization);
+                    // update appointments in record
+                    record.getAppointments().set(appointmentIndex, appointmentRecovered);
+                    // update treeMap with record
                     this.patientsRecordsTreeMap.replace(hospitalization.getPatientId(), record);
+                    // update store
                     this.persister.store(this.patientsRecordsTreeMap);
+                    return true;
                 }else{
-                    // there was an error
-                    this.message="There was an error recovering the hospitalization from database.";
+                    this.message="Hospitalization doesn't exist.";
+                    return false;
                 }
             }else{
-                this.message="The hospitalization Procedure doesn't exist in the database.";
+                this.message="Appointment doesn't exist.";
+                return false;
             }
         }else{
             this.message="The patient doesn't have a medical record.";
+            return false;
         }
     }
 
-    public void deleteHospitalization(String patientKey, String hospitalizationKey){
+    public boolean deleteHospitalization(String patientKey, String appointmentKey, String hospitalizationKey){
         this.message="Hospitalization successfully deleted.";
         MedicalRecord record = this.patientsRecordsTreeMap.get(patientKey);
 
         if(Objects.nonNull(record)){
-            List<Hospitalization> hospitalizationsDone = record.getHospitalizations();
-            Optional<Hospitalization> hospitalizationRecorded = hospitalizationsDone.stream().filter(
-                    p->p.getHospitalizationKey().equals(hospitalizationKey)
-            ).findFirst();
+            Optional<Appointment> appointmentE = record.getAppointments().stream()
+                    .filter(r -> r.getAppointmentKey().equals(appointmentKey)).findFirst();
 
-            if(hospitalizationRecorded.isPresent()) {
-                Hospitalization result = hospitalizationRecorded.get();
-                int indice = hospitalizationsDone.indexOf(result);
+            if(appointmentE.isPresent()) {
+                Appointment appointmentRecovered = appointmentE.get();
+                int appointmentIndex = record.getAppointments().indexOf(appointmentRecovered);
 
-                if(indice>-1){
-                    // replace the new laboratory analysis
-                    // I replace result with hospitalization and pursue the storage process
-                    hospitalizationsDone.remove(indice);
-                    record.setHospitalizations(hospitalizationsDone);
+                List<Hospitalization> hospitalizationsDone = appointmentRecovered.getHospitalizations();
+
+                Optional<Hospitalization> hospitalizationE = hospitalizationsDone.stream()
+                        .filter(h -> h.getHospitalizationKey().equals(hospitalizationKey)).findFirst();
+
+                if(hospitalizationE.isPresent()){
+                    Hospitalization hospitalizationRecovered = hospitalizationE.get();
+                    // replace element
+                    appointmentRecovered.getHospitalizations().remove(hospitalizationRecovered);
+                    // update appointments in record
+                    record.getAppointments().set(appointmentIndex, appointmentRecovered);
+                    // update treeMap with record
                     this.patientsRecordsTreeMap.replace(patientKey, record);
+                    // update store
                     this.persister.store(this.patientsRecordsTreeMap);
+                    return true;
                 }else{
-                    // there was an error
-                    this.message="There was an error recovering the hospitalization from database.";
+                    this.message="Hospitalization doesn't exist.";
+                    return false;
                 }
             }else{
-                this.message="The hospitalization Procedure doesn't exist in the database.";
+                this.message="Appointment doesn't exist.";
+                return false;
             }
         }else{
             this.message="The patient doesn't have a medical record.";
+            return false;
         }
     }
 

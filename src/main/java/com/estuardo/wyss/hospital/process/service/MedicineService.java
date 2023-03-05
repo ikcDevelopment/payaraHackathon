@@ -13,9 +13,9 @@ limitations under the License.*/
 
 package com.estuardo.wyss.hospital.process.service;
 
-import com.estuardo.wyss.hospital.patient.entities.Patient;
 import com.estuardo.wyss.hospital.treatment.Medicine;
 import jakarta.inject.Inject;
+import lombok.Getter;
 import one.microstream.integrations.cdi.types.Storage;
 import one.microstream.persistence.types.Persister;
 
@@ -42,6 +42,7 @@ public class MedicineService {
 
     private final TreeMap<String, Medicine> medicinesTreeMap = new TreeMap<>();
 
+    @Getter
     private String message="";
 
     public boolean addMedicine(Medicine medicine){

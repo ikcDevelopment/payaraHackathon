@@ -5,7 +5,6 @@ import com.estuardo.wyss.hospital.controller.responses.EmployeeResponse;
 import com.estuardo.wyss.hospital.controller.responses.EmployeesResponse;
 import com.estuardo.wyss.hospital.controller.responses.StandardResponse;
 import com.estuardo.wyss.hospital.hr.personnel.entities.Personnel;
-import com.estuardo.wyss.hospital.patient.entities.Patient;
 import com.estuardo.wyss.hospital.process.service.PersonnelService;
 import jakarta.ws.rs.Path;
 import jakarta.inject.Inject;
