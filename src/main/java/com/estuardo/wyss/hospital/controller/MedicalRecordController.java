@@ -38,7 +38,7 @@ public class MedicalRecordController {
     @POST
     @Path("/patient-record")
     public StandardResponse addMedicalRecord(MedicalRecord record){
-        String endPointApiKey="";
+        String endPointApiKey="zykduSyPuk7effmU$bACADIt3";
         StandardResponse hospitalResponse = new StandardResponse();
 
         hospitalResponse.setOperationStatus(this.medicalRecordService.addMedicalRecord(record));
@@ -52,7 +52,7 @@ public class MedicalRecordController {
     @POST
     @Path("/appointment")
     public StandardResponse addAppointment(Appointment appointment){
-        String endPointApiKey="";
+        String endPointApiKey="*wQ1Rp05SxB7c@sEZvOrg7QSZ";
         StandardResponse hospitalResponse = new StandardResponse();
 
         hospitalResponse.setOperationStatus(this.medicalRecordService.addAppointment(appointment));
@@ -64,69 +64,97 @@ public class MedicalRecordController {
     }
 
     @POST
-    @Path("/lab")
+    @Path("/lab/{patientId}/appointment/{appointmentKey}")
     public StandardResponse addLaboratoryAnalysis(
-            String patientId,
-            String appointmentKey,
+            @DefaultValue("error") @PathParam("patientId")String patientId,
+            @DefaultValue("error") @PathParam("appointmentKey")String appointmentKey,
             LaboratoryAnalysis lab){
-        String endPointApiKey="";
+        String endPointApiKey="nsGp3$aMXwr1wqq1XtgvyiKHn";
         StandardResponse hospitalResponse = new StandardResponse();
 
-        hospitalResponse.setOperationStatus(this.medicalRecordService.addLaboratoryAnalysis(patientId, appointmentKey, lab));
-        hospitalResponse.setStatus("ok");
-        hospitalResponse.setMessage(this.medicalRecordService.getMessage());
-        hospitalResponse.setSuccess(true);
+        if(!patientId.equals("error") && !appointmentKey.equals("error")) {
+            hospitalResponse.setOperationStatus(this.medicalRecordService.addLaboratoryAnalysis(patientId, appointmentKey, lab));
+            hospitalResponse.setStatus("ok");
+            hospitalResponse.setMessage(this.medicalRecordService.getMessage());
+            hospitalResponse.setSuccess(true);
+        }else{
+            hospitalResponse.setOperationStatus(false);
+            hospitalResponse.setMessage("Unauthorized access!!");
+            hospitalResponse.setSuccess(false);
+            hospitalResponse.setStatus("away");
+        }
 
         return hospitalResponse;
     }
 
     @POST
-    @Path("/prescription")
+    @Path("/prescription/{patientId}/appointment/{appointmentKey}")
     public StandardResponse addPrescription(
-            String patientId,
-            String appointmentKey,
+            @DefaultValue("error") @PathParam("patientId")String patientId,
+            @DefaultValue("error") @PathParam("appointmentKey")String appointmentKey,
             Prescription medicine){
-        String endPointApiKey="";
+        String endPointApiKey="2jy@69eG4jrjXrG00ub3Sixnm";
         StandardResponse hospitalResponse = new StandardResponse();
 
-        hospitalResponse.setOperationStatus(this.medicalRecordService.addPrescription(patientId, appointmentKey, medicine));
-        hospitalResponse.setStatus("ok");
-        hospitalResponse.setMessage(this.medicalRecordService.getMessage());
-        hospitalResponse.setSuccess(true);
+        if(!patientId.equals("error") && !appointmentKey.equals("error")) {
+            hospitalResponse.setOperationStatus(this.medicalRecordService.addPrescription(patientId, appointmentKey, medicine));
+            hospitalResponse.setStatus("ok");
+            hospitalResponse.setMessage(this.medicalRecordService.getMessage());
+            hospitalResponse.setSuccess(true);
+        }else{
+            hospitalResponse.setOperationStatus(false);
+            hospitalResponse.setMessage("Unauthorized access!!");
+            hospitalResponse.setSuccess(false);
+            hospitalResponse.setStatus("away");
+        }
 
         return hospitalResponse;
     }
 
     @POST
-    @Path("/medical-procedure")
+    @Path("/medical-procedure/{patientId}/appointment/{appointmentKey}")
     public StandardResponse addMedicalProcedure(
-            String patientId,
-            String appointmentKey,
+            @DefaultValue("error") @PathParam("patientId")String patientId,
+            @DefaultValue("error") @PathParam("appointmentKey")String appointmentKey,
             MedicalProcedure procedure){
-        String endPointApiKey="";
+        String endPointApiKey="0K6ffu3XbEU3l6cgNlezrr2iz";
         StandardResponse hospitalResponse = new StandardResponse();
 
-        hospitalResponse.setOperationStatus(this.medicalRecordService.addMedicalProcedure(patientId, appointmentKey, procedure));
-        hospitalResponse.setStatus("ok");
-        hospitalResponse.setMessage(this.medicalRecordService.getMessage());
-        hospitalResponse.setSuccess(true);
+        if(!patientId.equals("error") && !appointmentKey.equals("error")) {
+            hospitalResponse.setOperationStatus(this.medicalRecordService.addMedicalProcedure(patientId, appointmentKey, procedure));
+            hospitalResponse.setStatus("ok");
+            hospitalResponse.setMessage(this.medicalRecordService.getMessage());
+            hospitalResponse.setSuccess(true);
+        }else{
+            hospitalResponse.setOperationStatus(false);
+            hospitalResponse.setMessage("Unauthorized access!!");
+            hospitalResponse.setSuccess(false);
+            hospitalResponse.setStatus("away");
+        }
 
         return hospitalResponse;
     }
 
     @POST
-    @Path("/hospitalization")
+    @Path("/hospitalization/{patientId}/appointment/{appointmentKey}")
     public StandardResponse addHospitalization(
-            String patientId,
-            String appointmentKey,
+            @DefaultValue("error") @PathParam("patientId")String patientId,
+            @DefaultValue("error") @PathParam("appointmentKey")String appointmentKey,
             Hospitalization hospitalization){
-        String endPointApiKey="";
+        String endPointApiKey="1zaESx59jwcOyu64ehbUm3L8a";
         StandardResponse hospitalResponse = new StandardResponse();
 
-        hospitalResponse.setOperationStatus(this.medicalRecordService.addHospitalization(patientId, appointmentKey, hospitalization));
-        hospitalResponse.setStatus("ok");
-        hospitalResponse.setMessage(this.medicalRecordService.getMessage());
-        hospitalResponse.setSuccess(true);
+        if(!patientId.equals("error") && !appointmentKey.equals("error")) {
+            hospitalResponse.setOperationStatus(this.medicalRecordService.addHospitalization(patientId, appointmentKey, hospitalization));
+            hospitalResponse.setStatus("ok");
+            hospitalResponse.setMessage(this.medicalRecordService.getMessage());
+            hospitalResponse.setSuccess(true);
+        }else{
+            hospitalResponse.setOperationStatus(false);
+            hospitalResponse.setMessage("Unauthorized access!!");
+            hospitalResponse.setSuccess(false);
+            hospitalResponse.setStatus("away");
+        }
 
         return hospitalResponse;
     }
@@ -136,7 +164,7 @@ public class MedicalRecordController {
     public StandardResponse updateMedicalRecord(
             @DefaultValue("**error**") @PathParam("recordKey") String recordKey,
             MedicalRecord medicalRecord){
-        String endPointApiKey="";
+        String endPointApiKey="ok3zdvRjWOUnUyoG5F@ndBDlD";
         StandardResponse hospitalResponse = new StandardResponse();
 
         if(!recordKey.equals("error")) {
@@ -166,7 +194,7 @@ public class MedicalRecordController {
     public StandardResponse deleteMedicalRecord(
             @DefaultValue("**error**") @PathParam("recordKey") String recordKey,
             @DefaultValue("**error**") @PathParam("patientKey")  String patientKey){
-        String endPointApiKey="";
+        String endPointApiKey="uUR60ShZ6@nBPh0vpMceiNc3C";
         StandardResponse hospitalResponse = new StandardResponse();
 
         if(!recordKey.equals("error") && !patientKey.equals("error")) {
@@ -190,7 +218,7 @@ public class MedicalRecordController {
             @DefaultValue("**error**") @PathParam("recordKey") String recordKey,
             @DefaultValue("**error**") @PathParam("appointmentKey") String appointmentKey,
             LaboratoryAnalysis lab){
-        String endPointApiKey="";
+        String endPointApiKey="3$j#qg0lfFg9bn3olwe2QJC7V";
         StandardResponse hospitalResponse = new StandardResponse();
 
         if(!recordKey.equals("error") && !appointmentKey.equals("error")) {
@@ -216,7 +244,7 @@ public class MedicalRecordController {
             @DefaultValue("**error**") @PathParam("labKey") String labKey,
             @DefaultValue("**error**") @QueryParam("patientKey") String patientKey
             ){
-        String endPointApiKey="";
+        String endPointApiKey="bovO@D9m6VM204p8zWa*g#1R@";
         StandardResponse hospitalResponse = new StandardResponse();
 
         if(!recordKey.equals("error") && !appointmentKey.equals("error") && !labKey.equals("error")) {
@@ -240,7 +268,7 @@ public class MedicalRecordController {
             @DefaultValue("**error**") @PathParam("recordKey") String recordKey,
             @DefaultValue("**error**") @PathParam("appointmentKey") String appointmentKey,
             Prescription prescription){
-        String endPointApiKey="";
+        String endPointApiKey="2HU9cn@tnjBphk*etwSijfaMt";
         StandardResponse hospitalResponse = new StandardResponse();
 
         if(!recordKey.equals("error") && !appointmentKey.equals("error") ) {
@@ -266,7 +294,7 @@ public class MedicalRecordController {
             @DefaultValue("**error**") @PathParam("prescriptionKey") String prescriptionKey,
             @DefaultValue("**error**") @QueryParam("patientKey") String patientKey
             ){
-        String endPointApiKey="";
+        String endPointApiKey="c4e5tZi5981ks4qmPian51L10";
         StandardResponse hospitalResponse = new StandardResponse();
 
         if(!recordKey.equals("error") && !appointmentKey.equals("error") && !prescriptionKey.equals("error")) {
@@ -290,7 +318,7 @@ public class MedicalRecordController {
             @DefaultValue("**error**") @PathParam("recordKey") String recordKey,
             @DefaultValue("**error**") @PathParam("appointmentKey") String appointmentKey,
             MedicalProcedure medicalProcedure){
-        String endPointApiKey="";
+        String endPointApiKey="f1wkzmuwEt2c@ky25u0n5DNc4";
         StandardResponse hospitalResponse = new StandardResponse();
 
         if(!recordKey.equals("error") && !appointmentKey.equals("error") ) {
@@ -316,7 +344,7 @@ public class MedicalRecordController {
             @DefaultValue("**error**") @PathParam("medicalProcedureKey") String medicalProcedureKey,
             @DefaultValue("**error**") @QueryParam("patientKey") String patientKey
             ){
-        String endPointApiKey="";
+        String endPointApiKey="5g91Ds$$HbaY8kD@G4etsqt8U";
         StandardResponse hospitalResponse = new StandardResponse();
 
         if(!recordKey.equals("error") && !appointmentKey.equals("error") && !medicalProcedureKey.equals("error")) {
@@ -340,7 +368,7 @@ public class MedicalRecordController {
             @DefaultValue("**error**") @PathParam("recordKey") String recordKey,
             @DefaultValue("**error**") @PathParam("appointmentKey") String appointmentKey,
             Hospitalization hospitalization){
-        String endPointApiKey="";
+        String endPointApiKey="fcgh7L1ghyXaYw9cDcCN$seVd";
         StandardResponse hospitalResponse = new StandardResponse();
 
         if(!recordKey.equals("error") && !appointmentKey.equals("error") ) {
@@ -365,7 +393,7 @@ public class MedicalRecordController {
             @DefaultValue("**error**") @PathParam("appointmentKey") String appointmentKey,
             @DefaultValue("**error**") @PathParam("hospitalizationKey") String hospitalizationKey,
             @DefaultValue("**error**") @QueryParam("patientKey") String patientKey){
-        String endPointApiKey="";
+        String endPointApiKey="srQ7jZFwEOO9TbvuPqq7SLi3h";
         StandardResponse hospitalResponse = new StandardResponse();
 
         if(!recordKey.equals("error") && !appointmentKey.equals("error") && !hospitalizationKey.equals("error")) {

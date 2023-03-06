@@ -38,7 +38,7 @@ public class PersonnelController {
     public EmployeeResponse getEmployee(
             @DefaultValue("error") @PathParam("fiscalId") String fiscalId
     ){
-        String endPointApiKey="xyz45kjfdiou@io#978";
+        String endPointApiKey="bsNH0eeTmZiy1IhuaonZKq3P#";
         EmployeeResponse hospitalResponse = new EmployeeResponse();
 
         if(!fiscalId.equals("error")) {
@@ -68,7 +68,7 @@ public class PersonnelController {
     @GET
     @Path("/all")
     public EmployeesResponse getEmployees(){
-        String endPointApiKey="xyz45kjfdi*0ou@io#978";
+        String endPointApiKey="zbnrcvemlrYo9sp8B2j1bP9Lf";
         EmployeesResponse hospitalResponse = new EmployeesResponse();
 
         Collection<Personnel> employees = this.personnelService.getEmployees().values();
@@ -84,11 +84,11 @@ public class PersonnelController {
     }
 
     @POST
-    @Path("")
+    @Path("/new")
     public StandardResponse insertEmployee(
             Personnel employee
     ){
-        String endPointApiKey="xy3565kjfdiou@io#978";
+        String endPointApiKey="sDx6bxzWnanXKsT31Zsobnc8#";
         StandardResponse hospitalResponse = new StandardResponse();
 
         hospitalResponse.setOperationStatus(this.personnelService.addEmployee(employee));
@@ -100,11 +100,11 @@ public class PersonnelController {
     }
 
     @PUT
-    @Path("")
+    @Path("/update")
     public StandardResponse updateEmployee(
             Personnel employee
     ){
-        String endPointApiKey="xy3565kjfopdifdsou@io@978";
+        String endPointApiKey="hJi1E5cc5sdndlwKKy0Y2ah3V";
         StandardResponse hospitalResponse = new StandardResponse();
 
         hospitalResponse.setOperationStatus(this.personnelService.updateEmployee(employee));
@@ -116,11 +116,11 @@ public class PersonnelController {
     }
 
     @DELETE
-    @Path("/{fiscalId}")
-    public StandardResponse deletePatient(
+    @Path("/{fiscalId}/del")
+    public StandardResponse deleteEmployee(
             @DefaultValue("error") @PathParam("fiscalId") String fiscalId
     ){
-        String endPointApiKey="xy35659354kjfopdifdsou@io@978";
+        String endPointApiKey="s2Pm2@pXEkd4ZSAmhvYr9Im7V";
         StandardResponse hospitalResponse = new StandardResponse();
 
         if(!fiscalId.equals("error")) {

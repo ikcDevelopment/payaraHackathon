@@ -37,7 +37,7 @@ public class MedicineController {
     public MedicineResponse getMedicine(
             @DefaultValue("error") @PathParam("medicineKey") String medicineKey
     ){
-        String endPointApiKey="xyz45kjfdiou@io#978";
+        String endPointApiKey="vnN53cpUUUQdvrp7JmBjskj0F";
         MedicineResponse hospitalResponse = new MedicineResponse();
 
         if(!medicineKey.equals("error")) {
@@ -66,7 +66,7 @@ public class MedicineController {
     @GET
     @Path("/all")
     public MedicineListResponse getMedicines(){
-        String endPointApiKey="xyz45k6ddiou@io#978";
+        String endPointApiKey="4Bhh4ehitS9ngqZcrFq95tq5R";
         MedicineListResponse hospitalResponse = new MedicineListResponse();
 
         Collection<Medicine> Medicine = this.medicineService.getMedicines().values();
