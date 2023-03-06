@@ -14,6 +14,7 @@ limitations under the License.*/
 package com.estuardo.wyss.hospital.process.service;
 
 import com.estuardo.wyss.hospital.treatment.Medicine;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import lombok.Getter;
 import one.microstream.integrations.cdi.types.Storage;
@@ -36,6 +37,7 @@ import java.util.TreeMap;
  * @date 03/02/2023
  */
 @Storage
+
 public class MedicineService {
     @Inject
     private transient Persister persister;

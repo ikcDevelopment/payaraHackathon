@@ -5,6 +5,7 @@ import com.estuardo.wyss.hospital.controller.responses.MedicineListResponse;
 import com.estuardo.wyss.hospital.controller.responses.MedicineResponse;
 import com.estuardo.wyss.hospital.process.service.MedicineService;
 import com.estuardo.wyss.hospital.treatment.Medicine;
+import jakarta.enterprise.context.RequestScoped;
 import jakarta.ws.rs.Path;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -22,6 +23,7 @@ import java.util.Objects;
 @Path("/medicines")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
+@RequestScoped
 public class MedicineController {
     @Inject
     MedicineService medicineService;

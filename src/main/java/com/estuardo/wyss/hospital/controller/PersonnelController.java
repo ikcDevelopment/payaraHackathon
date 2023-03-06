@@ -1,11 +1,10 @@
 package com.estuardo.wyss.hospital.controller;
 
 
-import com.estuardo.wyss.hospital.controller.responses.EmployeeResponse;
-import com.estuardo.wyss.hospital.controller.responses.EmployeesResponse;
-import com.estuardo.wyss.hospital.controller.responses.StandardResponse;
+import com.estuardo.wyss.hospital.controller.responses.*;
 import com.estuardo.wyss.hospital.hr.personnel.entities.Personnel;
 import com.estuardo.wyss.hospital.process.service.PersonnelService;
+import jakarta.enterprise.context.RequestScoped;
 import jakarta.ws.rs.Path;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -13,6 +12,7 @@ import jakarta.ws.rs.core.MediaType;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -23,6 +23,7 @@ import java.util.Objects;
 @Path("/personnel")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
+@RequestScoped
 public class PersonnelController {
     @Inject
     PersonnelService personnelService;
@@ -75,6 +76,34 @@ public class PersonnelController {
 
         hospitalResponse.setSuccess(true);
         hospitalResponse.setEmployees(new ArrayList<Personnel>(employees));
+        hospitalResponse.setMessage(this.personnelService.getMessage());
+        hospitalResponse.setStatus("ok");
+
+        hospitalResponse.setOperationStatus(true);
+
+        return hospitalResponse;
+    }
+
+    @GET
+    @Path("/all-tree-ui")
+    public DataTreeUI getEmployeesTreeUi(){
+        String endPointApiKey="zopipfduemlrYo9sp8B2j1bP9Lf";
+        DataTreeUI hospitalResponse = new DataTreeUI();
+        List<DataTreeNodeUI> nodes = new ArrayList<>();
+
+        Collection<Personnel> employees = this.personnelService.getEmployees().values();
+
+        List<Personnel> data = new ArrayList<Personnel>(employees);
+
+        data.forEach(d->{
+            DataTreeNodeUI dtnui = new DataTreeNodeUI();
+            dtnui.setId(d.getFiscalId());
+            dtnui.setName(d.getFirstName()+ ' '+d.getLastName());
+            nodes.add(dtnui);
+        });
+
+        hospitalResponse.setSuccess(true);
+        hospitalResponse.setNodes(nodes);
         hospitalResponse.setMessage(this.personnelService.getMessage());
         hospitalResponse.setStatus("ok");
 

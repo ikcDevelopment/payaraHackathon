@@ -8,6 +8,7 @@ import com.estuardo.wyss.hospital.treatment.Appointment;
 import com.estuardo.wyss.hospital.treatment.Hospitalization;
 import com.estuardo.wyss.hospital.treatment.MedicalProcedure;
 import com.estuardo.wyss.hospital.treatment.Prescription;
+import jakarta.enterprise.context.RequestScoped;
 import jakarta.ws.rs.Path;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -25,6 +26,7 @@ import java.util.Objects;
 @Path("/medical-record")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
+@RequestScoped
 public class MedicalRecordController {
     @Inject
     MedicalRecordService medicalRecordService;

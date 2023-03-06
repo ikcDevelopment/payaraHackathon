@@ -14,6 +14,7 @@ limitations under the License.*/
 package com.estuardo.wyss.hospital.process.service;
 
 import com.estuardo.wyss.hospital.hr.personnel.entities.Personnel;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import lombok.Getter;
 import one.microstream.integrations.cdi.types.Storage;
@@ -27,6 +28,7 @@ import java.util.*;
  * @date 03/02/2023
  */
 @Storage
+
 public class PersonnelService {
 
     @Inject

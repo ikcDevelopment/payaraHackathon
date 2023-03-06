@@ -19,6 +19,7 @@ import com.estuardo.wyss.hospital.treatment.Appointment;
 import com.estuardo.wyss.hospital.treatment.Hospitalization;
 import com.estuardo.wyss.hospital.treatment.MedicalProcedure;
 import com.estuardo.wyss.hospital.treatment.Prescription;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import lombok.Getter;
 import one.microstream.integrations.cdi.types.Storage;

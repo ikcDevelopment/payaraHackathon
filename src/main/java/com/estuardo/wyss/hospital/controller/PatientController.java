@@ -6,6 +6,7 @@ import com.estuardo.wyss.hospital.controller.responses.PatientResponse;
 import com.estuardo.wyss.hospital.controller.responses.StandardResponse;
 import com.estuardo.wyss.hospital.patient.entities.Patient;
 import com.estuardo.wyss.hospital.process.service.PatientService;
+import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -22,6 +23,7 @@ import java.util.Objects;
 @Path("/patients")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
+@RequestScoped
 public class PatientController {
     @Inject
     PatientService patientService;

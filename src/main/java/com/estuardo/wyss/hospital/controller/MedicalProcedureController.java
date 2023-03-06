@@ -1,5 +1,6 @@
 package com.estuardo.wyss.hospital.controller;
 
+import jakarta.enterprise.context.RequestScoped;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -14,6 +15,7 @@ import jakarta.ws.rs.core.MediaType;
 @Path("/medical-procedure")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
+@RequestScoped
 public class MedicalProcedureController {
 
     @GET

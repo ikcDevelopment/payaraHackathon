@@ -127,3 +127,22 @@ the patient:
                 private String roomDescription;
                 private BigDecimal roomFee;
             }`
+
+
+Mi project compiled but, I could not deploy and test it because of missing dependencies.
+See next class (these are the missing dependencies: **@Stereotype** and **@Alternative**):
+
+   `@Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
+    @Stereotype
+    @Alternative
+    public @interface Storage
+    {
+    }`
+   
+This is the jdk I am using:
+
+java -version
+openjdk version "17.0.6" 2023-01-17 LTS
+OpenJDK Runtime Environment Zulu17.40+19-CA (build 17.0.6+10-LTS)
+OpenJDK 64-Bit Server VM Zulu17.40+19-CA (build 17.0.6+10-LTS, mixed mode, sharing)
