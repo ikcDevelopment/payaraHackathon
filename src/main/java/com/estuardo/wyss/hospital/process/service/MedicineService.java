@@ -15,10 +15,7 @@ package com.estuardo.wyss.hospital.process.service;
 
 import com.estuardo.wyss.hospital.treatment.Medicine;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import lombok.Getter;
-import one.microstream.integrations.cdi.types.Storage;
-import one.microstream.persistence.types.Persister;
 
 import java.util.Collections;
 import java.util.Objects;
@@ -36,11 +33,8 @@ import java.util.TreeMap;
  * @coder estuardo.wyss
  * @date 03/02/2023
  */
-@Storage
-
+@ApplicationScoped
 public class MedicineService {
-    @Inject
-    private transient Persister persister;
 
     private final TreeMap<String, Medicine> medicinesTreeMap = new TreeMap<>();
 
@@ -51,7 +45,7 @@ public class MedicineService {
         this.message="Medicine successfully added.";
         if(!this.medicinesTreeMap.containsKey(medicine.getMedicineKey())){
             this.medicinesTreeMap.put(medicine.getMedicineKey(), medicine);
-            this.persister.store(this.medicinesTreeMap);
+            //this.persister.store(this.medicinesTreeMap);
             return true;
         }else{
             this.message="Medicine already exists in database.";
@@ -82,7 +76,7 @@ public class MedicineService {
             this.message="Medicine you intend to update, does not exists in database.";
             return false;
         }else{
-            this.persister.store(this.medicinesTreeMap);
+            //this.persister.store(this.medicinesTreeMap);
             return true;
         }
     }
@@ -95,7 +89,7 @@ public class MedicineService {
             this.message="Patient you intend to delete, does not exists in database.";
             return false;
         }else{
-            this.persister.store(this.medicinesTreeMap);
+            //this.persister.store(this.medicinesTreeMap);
             return true;
         }
     }

@@ -1,19 +1,18 @@
 package com.estuardo.wyss.hospital.controller;
 
+import com.estuardo.wyss.hospital.controller.responses.MedicalRecordResponse;
 import com.estuardo.wyss.hospital.controller.responses.StandardResponse;
 import com.estuardo.wyss.hospital.patient.entities.LaboratoryAnalysis;
 import com.estuardo.wyss.hospital.patient.entities.MedicalRecord;
 import com.estuardo.wyss.hospital.process.service.MedicalRecordService;
-import com.estuardo.wyss.hospital.treatment.Appointment;
-import com.estuardo.wyss.hospital.treatment.Hospitalization;
-import com.estuardo.wyss.hospital.treatment.MedicalProcedure;
-import com.estuardo.wyss.hospital.treatment.Prescription;
+import com.estuardo.wyss.hospital.treatment.*;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.ws.rs.Path;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
@@ -37,6 +36,24 @@ public class MedicalRecordController {
         return "Your are getting into wyss-hospital-personnel Cloud Applications World!";
     }
 
+    @GET
+    @Path("/{patientId}")
+    public MedicalRecordResponse getRecord(
+        @DefaultValue("error") @PathParam("patientId")String patientId
+    ){
+        MedicalRecordResponse hospitalResponse = new MedicalRecordResponse();
+
+        MedicalRecord record = this.medicalRecordService.getMedicalRecord(patientId);
+
+        hospitalResponse.setOperationStatus(record != null);
+        hospitalResponse.setStatus("ok");
+        hospitalResponse.setMessage(this.medicalRecordService.getMessage());
+        hospitalResponse.setSuccess(true);
+        hospitalResponse.setMedicalRecord(record);
+
+        return hospitalResponse;
+    }
+
     @POST
     @Path("/patient-record")
     public StandardResponse addMedicalRecord(MedicalRecord record){
@@ -53,11 +70,25 @@ public class MedicalRecordController {
 
     @POST
     @Path("/appointment")
-    public StandardResponse addAppointment(Appointment appointment){
+    public StandardResponse addAppointment(AppointmentParam appointment){
         String endPointApiKey="*wQ1Rp05SxB7c@sEZvOrg7QSZ";
         StandardResponse hospitalResponse = new StandardResponse();
+        String[] date1 = appointment.getAppointmentDate().split("-");
+        String[] date2 =appointment.getSymptomsStartedDate().split("-");
 
-        hospitalResponse.setOperationStatus(this.medicalRecordService.addAppointment(appointment));
+        java.sql.Date d1 = new java.sql.Date(Integer.parseInt(date1[0]), Integer.parseInt(date1[1]), Integer.parseInt(date1[2]));
+        java.sql.Date d2 = new java.sql.Date(Integer.parseInt(date2[0]), Integer.parseInt(date2[1]), Integer.parseInt(date2[2]));
+        Appointment apt = new Appointment();
+
+        apt.setAppointmentKey(appointment.getAppointmentKey());
+        apt.setPatientId(appointment.getPatientId());
+        apt.setDoctorId(appointment.getDoctorId());
+        apt.setSymptoms(appointment.getSymptoms());
+        apt.setAppointmentDate(d1);
+        apt.setSymptomsStartedDate(d2);
+        apt.setAppointmentDescription(appointment.getAppointmentDescription());
+
+        hospitalResponse.setOperationStatus(this.medicalRecordService.addAppointment(apt));
         hospitalResponse.setStatus("ok");
         hospitalResponse.setMessage(this.medicalRecordService.getMessage());
         hospitalResponse.setSuccess(true);

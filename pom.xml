@@ -37,6 +37,12 @@
             <artifactId>microstream-integrations-cdi</artifactId>
             <version>08.00.00-MS-EA2</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/one.microstream/microstream-storage-embedded-configuration -->
+        <dependency>
+            <groupId>one.microstream</groupId>
+            <artifactId>microstream-storage-embedded-configuration</artifactId>
+            <version>08.00.00-MS-EA2</version>
+        </dependency>
 
         <dependency>
             <groupId>org.projectlombok</groupId>

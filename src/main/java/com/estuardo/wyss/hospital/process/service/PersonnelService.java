@@ -15,24 +15,21 @@ package com.estuardo.wyss.hospital.process.service;
 
 import com.estuardo.wyss.hospital.hr.personnel.entities.Personnel;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import lombok.Getter;
-import one.microstream.integrations.cdi.types.Storage;
-import one.microstream.persistence.types.Persister;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Objects;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 /**
  * @project payara.hackathon.jakartaEE10
  * @coder estuardo.wyss
  * @date 03/02/2023
  */
-@Storage
 
+@ApplicationScoped
 public class PersonnelService {
-
-    @Inject
-    private transient Persister persister;
 
     private final TreeMap<String, Personnel> personnelTreeMap = new TreeMap<>();
 
@@ -43,7 +40,7 @@ public class PersonnelService {
         this.message="Employee successfully added.";
         if(!this.personnelTreeMap.containsKey(employee.getFiscalId())){
             this.personnelTreeMap.put(employee.getFiscalId(), employee);
-            this.persister.store(this.personnelTreeMap);
+            //this.persister.store(this.personnelTreeMap);
             return true;
         }else{
             this.message="Employee already exists in database.";
@@ -74,7 +71,7 @@ public class PersonnelService {
             this.message="Employee you intend to update, does not exists in database.";
             return false;
         }else{
-            this.persister.store(this.personnelTreeMap);
+            //this.persister.store(this.personnelTreeMap);
             return true;
         }
     }
@@ -87,7 +84,7 @@ public class PersonnelService {
             this.message="Employee you intend to delete, does not exists in database.";
             return false;
         }else{
-            this.persister.store(this.personnelTreeMap);
+            //this.persister.store(this.personnelTreeMap);
             return true;
         }
     }

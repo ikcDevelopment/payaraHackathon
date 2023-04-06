@@ -19,13 +19,17 @@ import com.estuardo.wyss.hospital.treatment.Appointment;
 import com.estuardo.wyss.hospital.treatment.Hospitalization;
 import com.estuardo.wyss.hospital.treatment.MedicalProcedure;
 import com.estuardo.wyss.hospital.treatment.Prescription;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import lombok.Getter;
-import one.microstream.integrations.cdi.types.Storage;
-import one.microstream.persistence.types.Persister;
+import one.microstream.storage.embedded.types.EmbeddedStorage;
+import one.microstream.storage.embedded.types.EmbeddedStorageManager;
 
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.TreeMap;
 /**
  * TODO refactor medical record, creating an object to store each visit to the hospital
  */
@@ -35,15 +39,33 @@ import java.util.*;
  * @coder estuardo.wyss
  * @date 03/02/2023
  */
-@Storage
+
+@ApplicationScoped
 public class MedicalRecordService {
 
-    @Inject
-    private transient Persister persister;
 
     private final TreeMap<String, MedicalRecord> patientsRecordsTreeMap = new TreeMap<>();
     @Getter
     private String message="";
+
+    // Initialize a storage manager ("the database") with purely defaults.
+    EmbeddedStorageManager storageManager;
+
+    public MedicalRecord getMedicalRecord(String key){
+        return this.patientsRecordsTreeMap.get(key);
+    }
+
+    @PreDestroy
+    public void shutDownMicroStream(){
+        // shutdown storage
+        storageManager.shutdown();
+    }
+
+    @PostConstruct
+    public void initMicroStream(){
+        storageManager = EmbeddedStorage.start();
+        storageManager.setRoot(patientsRecordsTreeMap);
+    }
 
     /**
      * Create the patient's medical record for the first time
@@ -54,7 +76,8 @@ public class MedicalRecordService {
         this.message="Medical record for the Patient successfully added.";
         if(!this.patientsRecordsTreeMap.containsKey(record.getPatientId())){
             this.patientsRecordsTreeMap.put(record.getPatientId(), record);
-            this.persister.store(this.patientsRecordsTreeMap);
+            // Store the modified root and its content.
+            storageManager.storeRoot();
             return true;
         }else{
             this.message="Patient already has a medical record in database.";
@@ -74,7 +97,8 @@ public class MedicalRecordService {
                 if(appointmentE.isEmpty()){
                     record.getAppointments().add(appointment);
                     this.patientsRecordsTreeMap.put(record.getPatientId(), record);
-                    this.persister.store(this.patientsRecordsTreeMap);
+                    // Store the modified root and its content.
+                    storageManager.storeRoot();
                     return true;
                 }else{
                     this.message="The appointment already exists in database.";
@@ -111,7 +135,8 @@ public class MedicalRecordService {
                 // update treeMap with record
                 this.patientsRecordsTreeMap.replace(patientId, record);
                 // update store
-                this.persister.store(this.patientsRecordsTreeMap);
+                // Store the modified root and its content.
+                storageManager.storeRoot();
                 return true;
             }else{
                 this.message="Appointment doesn't exist.";
@@ -141,7 +166,8 @@ public class MedicalRecordService {
                 // update treeMap with record
                 this.patientsRecordsTreeMap.replace(patientId, record);
                 // update store
-                this.persister.store(this.patientsRecordsTreeMap);
+                // Store the modified root and its content.
+                storageManager.storeRoot();
                 return true;
             }else{
                 this.message="Appointment doesn't exist.";
@@ -172,7 +198,8 @@ public class MedicalRecordService {
                 // update treeMap with record
                 this.patientsRecordsTreeMap.replace(patientId, record);
                 // update store
-                this.persister.store(this.patientsRecordsTreeMap);
+                // Store the modified root and its content.
+                storageManager.storeRoot();
                 return true;
             }else{
                 this.message="Appointment doesn't exist.";
@@ -202,7 +229,8 @@ public class MedicalRecordService {
                 // update treeMap with record
                 this.patientsRecordsTreeMap.replace(patientId, record);
                 // update store
-                this.persister.store(this.patientsRecordsTreeMap);
+                // Store the modified root and its content.
+                storageManager.storeRoot();
                 return true;
             }else{
                 this.message="Appointment doesn't exist.";
@@ -223,7 +251,8 @@ public class MedicalRecordService {
             record.setDoctorId(medicalRecord.getDoctorId());
 
             this.patientsRecordsTreeMap.replace(medicalRecord.getPatientId(), record);
-            this.persister.store(this.patientsRecordsTreeMap);
+            // Store the modified root and its content.
+            storageManager.storeRoot();
             return true;
         }else{
             this.message="The patient doesn't have a medical record.";
@@ -241,7 +270,8 @@ public class MedicalRecordService {
                 return false;
             }else{
                 this.patientsRecordsTreeMap.remove(patientKey);
-                this.persister.store(this.patientsRecordsTreeMap);
+                // Store the modified root and its content.
+            storageManager.storeRoot();
                 return true;
             }
         }else{
@@ -277,7 +307,8 @@ public class MedicalRecordService {
                     // update treeMap with record
                     this.patientsRecordsTreeMap.replace(lab.getPatientId(), record);
                     // update store
-                    this.persister.store(this.patientsRecordsTreeMap);
+                    // Store the modified root and its content.
+                    storageManager.storeRoot();
                     return true;
                 }else{
                     this.message="Laboratory analysis doesn't exist.";
@@ -320,7 +351,8 @@ public class MedicalRecordService {
                     // update treeMap with record
                     this.patientsRecordsTreeMap.replace(patientKey, record);
                     // update store
-                    this.persister.store(this.patientsRecordsTreeMap);
+                    // Store the modified root and its content.
+                    storageManager.storeRoot();
                     return true;
                 }else{
                     this.message="Laboratory analysis doesn't exist.";
@@ -363,7 +395,8 @@ public class MedicalRecordService {
                     // update treeMap with record
                     this.patientsRecordsTreeMap.replace(prescription.getPatientId(), record);
                     // update store
-                    this.persister.store(this.patientsRecordsTreeMap);
+                    // Store the modified root and its content.
+                    storageManager.storeRoot();
                     return true;
                 }else{
                     this.message="Laboratory analysis doesn't exist.";
@@ -406,7 +439,8 @@ public class MedicalRecordService {
                     // update treeMap with record
                     this.patientsRecordsTreeMap.replace(patientKey, record);
                     // update store
-                    this.persister.store(this.patientsRecordsTreeMap);
+                    // Store the modified root and its content.
+                    storageManager.storeRoot();
                     return true;
                 }else{
                     this.message="Prescription doesn't exist.";
@@ -450,7 +484,8 @@ public class MedicalRecordService {
                     // update treeMap with record
                     this.patientsRecordsTreeMap.replace(medicalProcedure.getPatientId(), record);
                     // update store
-                    this.persister.store(this.patientsRecordsTreeMap);
+                    // Store the modified root and its content.
+                    storageManager.storeRoot();
                     return true;
                 }else{
                     this.message="Medical procedure doesn't exist.";
@@ -492,7 +527,8 @@ public class MedicalRecordService {
                     // update treeMap with record
                     this.patientsRecordsTreeMap.replace(patientKey, record);
                     // update store
-                    this.persister.store(this.patientsRecordsTreeMap);
+                    // Store the modified root and its content.
+                    storageManager.storeRoot();
                     return true;
                 }else{
                     this.message="Medical procedure doesn't exist.";
@@ -535,7 +571,8 @@ public class MedicalRecordService {
                     // update treeMap with record
                     this.patientsRecordsTreeMap.replace(hospitalization.getPatientId(), record);
                     // update store
-                    this.persister.store(this.patientsRecordsTreeMap);
+                    // Store the modified root and its content.
+                    storageManager.storeRoot();
                     return true;
                 }else{
                     this.message="Hospitalization doesn't exist.";
@@ -577,7 +614,8 @@ public class MedicalRecordService {
                     // update treeMap with record
                     this.patientsRecordsTreeMap.replace(patientKey, record);
                     // update store
-                    this.persister.store(this.patientsRecordsTreeMap);
+                    // Store the modified root and its content.
+                    storageManager.storeRoot();
                     return true;
                 }else{
                     this.message="Hospitalization doesn't exist.";
